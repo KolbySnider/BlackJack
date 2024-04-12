@@ -25,12 +25,20 @@ public class BlackjackClient {
             inputStream = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
+            // Handle the connection failure, e.g., display an error message to the user
+            Platform.runLater(() -> {
+                gui.showAlert("Connection Error", "Failed to connect to the server. Please check the server address and port.");
+            });
         }
     }
 
     public void start() {
+        // Prompt for player name
+        String playerName = (String) gui.getPlayerName();
+        setPlayerName(playerName);
+
         // Send player name to the server
-        sendMessage(new Message(MessageType.PLAYER_JOINED, gui.getPlayerName()));
+        sendMessage(new Message(MessageType.PLAYER_JOINED, playerName));
 
         // Start listening for server messages
         new Thread(() -> {
@@ -68,10 +76,16 @@ public class BlackjackClient {
 
     public void sendMessage(Message message) {
         try {
-            outputStream.writeObject(message);
-            outputStream.flush();
+            if (outputStream != null) {
+                outputStream.writeObject(message);
+                outputStream.flush();
+            }
         } catch (IOException e) {
             e.printStackTrace();
+            // Handle the message sending failure, e.g., display an error message to the user
+            Platform.runLater(() -> {
+                gui.showAlert("Communication Error", "Failed to send message to the server. Please check the connection.");
+            });
         }
     }
 

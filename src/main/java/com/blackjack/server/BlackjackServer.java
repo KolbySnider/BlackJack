@@ -13,14 +13,17 @@ import java.util.List;
 
 public class BlackjackServer {
     private static final int PORT = 8888;
+    private static final int REQUIRED_PLAYERS = 1;
 
     private ServerSocket serverSocket;
     private List<ClientHandler> clients;
     private GameState gameState;
+    private int connectedPlayers;
 
     public BlackjackServer() {
         clients = new ArrayList<>();
         gameState = new GameState();
+        connectedPlayers = 0;
     }
 
     public void start() {
@@ -32,11 +35,25 @@ public class BlackjackServer {
                 Socket socket = serverSocket.accept();
                 ClientHandler clientHandler = new ClientHandler(socket, this);
                 clients.add(clientHandler);
-                new Thread(String.valueOf(clientHandler)).start();
+                new Thread(clientHandler).start();
+
+                connectedPlayers++;
+                System.out.println("Player connected. Connected players: " + connectedPlayers);
+
+                if (connectedPlayers == REQUIRED_PLAYERS) {
+                    startGame();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void startGame() {
+        System.out.println("Starting the game...");
+        gameState.startNewGame();
+        gameState.dealInitialCards();
+        broadcast(new Message(MessageType.GAME_STATE, gameState));
     }
 
     public synchronized void broadcast(Message message) {
@@ -53,7 +70,7 @@ public class BlackjackServer {
                 gameState.addPlayer(player);
                 sender.setPlayer(player);
                 broadcast(new Message(MessageType.PLAYER_JOINED, playerName));
-                System.out.println("Player " + playerName + " joined the game."); // Log player joining
+                System.out.println("Player " + playerName + " joined the game.");
                 break;
             case PLACE_BET:
                 int betAmount = (int) message.getPayload();

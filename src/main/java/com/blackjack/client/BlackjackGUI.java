@@ -18,44 +18,104 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class BlackjackGUI extends Application {
     private BlackjackClient client;
     private Stage stage;
-    private Label messageLabel;
+    private VBox playerBox;
     private Label balanceLabel;
-    private TextField betTextField; // Declare betTextField as an instance variable
-    private Button hitButton;
-    private Button standButton;
+    private Label messageLabel;
     private HBox playerCardsBox;
     private HBox dealerCardsBox;
     private TextArea chatArea;
     private TextField chatTextField;
+    private TextField betTextField;
+    private Button hitButton;
+    private Button standButton;
+
+    private String playerName;
 
     @Override
     public void start(Stage primaryStage) {
         stage = primaryStage;
         stage.setTitle("Blackjack");
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(10));
-        root.setAlignment(Pos.CENTER);
+        // Create start screen
+        VBox startScreen = createStartScreen();
+        Scene startScene = new Scene(startScreen, 400, 300);
+        stage.setScene(startScene);
+        stage.show();
+    }
 
-        HBox playerBoxes = new HBox(10);
-        playerBoxes.setAlignment(Pos.CENTER);
+    private VBox createStartScreen() {
+        VBox startScreen = new VBox(10);
+        startScreen.setPadding(new Insets(10));
+        startScreen.setAlignment(Pos.CENTER);
 
-        VBox dealerBox = new VBox(10);
+        Label titleLabel = new Label("Blackjack");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+
+        TextField nameTextField = new TextField();
+        nameTextField.setPromptText("Enter your name");
+        nameTextField.setMaxWidth(200);
+
+        Button connectButton = new Button("Connect");
+        connectButton.setOnAction(e -> {
+            playerName = nameTextField.getText().trim();
+            if (!playerName.isEmpty()) {
+                connectToServer();
+            }
+        });
+
+        startScreen.getChildren().addAll(titleLabel, nameTextField, connectButton);
+        return startScreen;
+    }
+
+    private void connectToServer() {
+        client = new BlackjackClient("localhost", 8888, this);
+        String playerName = getPlayerName();
+        System.out.println("Player name: " + playerName); // Debugging statement
+        client.setPlayerName(playerName);
+        client.start();
+
+        // Create main game screen
+        VBox gameScreen = createGameScreen();
+        Scene gameScene = new Scene(gameScreen, 800, 600);
+        stage.setScene(gameScene);
+    }
+
+    private VBox createGameScreen() {
+        VBox gameScreen = new VBox(10);
+        gameScreen.setPadding(new Insets(10));
+        gameScreen.setAlignment(Pos.CENTER);
+
+        HBox dealerBox = new HBox(10);
         dealerBox.setAlignment(Pos.CENTER);
         Label dealerLabel = new Label("Dealer");
         dealerCardsBox = new HBox(10);
         dealerBox.getChildren().addAll(dealerLabel, dealerCardsBox);
 
-        for (int i = 0; i < 4; i++) {
-            VBox playerBox = createPlayerBox(i);
-            playerBoxes.getChildren().add(playerBox);
-        }
+        playerBox = new VBox(10);
+        playerBox.setAlignment(Pos.CENTER);
+        Label playerLabel = new Label(playerName);
+        balanceLabel = new Label("Balance: $1000");
+        playerCardsBox = new HBox(10);
+        betTextField = new TextField();
+        betTextField.setPromptText("Enter bet amount");
+        betTextField.setMaxWidth(100);
+        Button betButton = new Button("Place Bet");
+        betButton.setOnAction(e -> placeBet());
+        hitButton = new Button("Hit");
+        hitButton.setOnAction(e -> hit());
+        standButton = new Button("Stand");
+        standButton.setOnAction(e -> stand());
+        HBox buttonBox = new HBox(10);
+        buttonBox.getChildren().addAll(hitButton, standButton);
+        playerBox.getChildren().addAll(playerLabel, balanceLabel, playerCardsBox, betTextField, betButton, buttonBox);
+
+        messageLabel = new Label();
+        messageLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         chatArea = new TextArea();
         chatArea.setEditable(false);
@@ -71,41 +131,8 @@ public class BlackjackGUI extends Application {
         HBox chatBox = new HBox(10);
         chatBox.getChildren().addAll(chatTextField, sendButton);
 
-        root.getChildren().addAll(dealerBox, playerBoxes, chatArea, chatBox);
-
-        Scene scene = new Scene(root, 800, 600);
-        stage.setScene(scene);
-        stage.show();
-
-        // Connect to the server
-        client = new BlackjackClient("localhost", 8888, this);
-        client.start();
-    }
-
-    private VBox createPlayerBox(int index) {
-        VBox playerBox = new VBox(10);
-        playerBox.setAlignment(Pos.CENTER);
-
-        Label playerLabel = new Label("Player " + (index + 1));
-        Label balanceLabel = new Label("Balance: $2000");
-
-        betTextField = new TextField(); // Initialize betTextField
-        betTextField.setPromptText("Enter bet amount");
-
-        Button betButton = new Button("Place Bet");
-        betButton.setOnAction(e -> placeBet());
-
-        Button hitButton = new Button("Hit");
-        hitButton.setOnAction(e -> hit());
-
-        Button standButton = new Button("Stand");
-        standButton.setOnAction(e -> stand());
-
-        HBox cardsBox = new HBox(10);
-
-        playerBox.getChildren().addAll(playerLabel, balanceLabel, betTextField, betButton, hitButton, standButton, cardsBox);
-
-        return playerBox;
+        gameScreen.getChildren().addAll(dealerBox, playerBox, messageLabel, chatArea, chatBox);
+        return gameScreen;
     }
 
     private void placeBet() {
@@ -115,12 +142,10 @@ public class BlackjackGUI extends Application {
                 int betAmount = Integer.parseInt(betAmountString);
                 client.sendMessage(new Message(MessageType.PLACE_BET, betAmount));
             } catch (NumberFormatException e) {
-                // Display an error message or take appropriate action
-                System.out.println("Invalid bet amount. Please enter a valid integer value.");
+                showAlert("Invalid Bet Amount", "Please enter a valid integer value.");
             }
         } else {
-            // Display an error message or take appropriate action
-            System.out.println("Please enter a bet amount.");
+            showAlert("Missing Bet Amount", "Please enter a bet amount.");
         }
     }
 
@@ -133,7 +158,7 @@ public class BlackjackGUI extends Application {
     }
 
     private void sendChatMessage() {
-        String message = chatTextField.getText();
+        String message = chatTextField.getText().trim();
         if (!message.isEmpty()) {
             client.sendMessage(new Message(MessageType.CHAT_MESSAGE, message));
             chatTextField.clear();
@@ -142,7 +167,7 @@ public class BlackjackGUI extends Application {
 
     public void updateGameState(GameState gameState) {
         Platform.runLater(() -> {
-            Player player = gameState.getPlayer(client.getPlayerName());
+            Player player = gameState.getPlayer(playerName);
             balanceLabel.setText("Balance: $" + player.getBalance());
 
             playerCardsBox.getChildren().clear();
@@ -154,9 +179,9 @@ public class BlackjackGUI extends Application {
             List<Card> dealerCards = gameState.getDealer().getHand().getCards();
             for (int i = 0; i < dealerCards.size(); i++) {
                 if (i == 0 && !gameState.isGameOver()) {
-                    ImageView backImageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/back.png"))));
-                    backImageView.setFitWidth(95);
-                    backImageView.setFitHeight(130);
+                    ImageView backImageView = new ImageView(new Image(getClass().getResourceAsStream("/resources/images/back.png")));
+                    backImageView.setFitWidth(60);
+                    backImageView.setFitHeight(80);
                     dealerCardsBox.getChildren().add(backImageView);
                 } else {
                     dealerCardsBox.getChildren().add(createCardImageView(dealerCards.get(i)));
@@ -171,7 +196,7 @@ public class BlackjackGUI extends Application {
             } else {
                 messageLabel.setText("");
                 Player currentPlayer = gameState.getCurrentPlayer();
-                if (currentPlayer != null && currentPlayer.getName().equals(client.getPlayerName())) {
+                if (currentPlayer != null && currentPlayer.getName().equals(playerName)) {
                     hitButton.setDisable(false);
                     standButton.setDisable(false);
                 } else {
@@ -188,14 +213,14 @@ public class BlackjackGUI extends Application {
             rank = "ten";
         }
         String imagePath = "/images/" + rank + "_of_" + card.getSuit().toLowerCase() + ".png";
-        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+        Image image = new Image(getClass().getResourceAsStream(imagePath));
         if (image.isError()) {
             System.err.println("Error loading image: " + imagePath);
             return new ImageView(); // Return an empty ImageView if the image cannot be loaded
         }
         ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(95);
-        imageView.setFitHeight(130);
+        imageView.setFitWidth(60);
+        imageView.setFitHeight(80);
         return imageView;
     }
 
@@ -216,8 +241,20 @@ public class BlackjackGUI extends Application {
         }
     }
 
+    void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
     public void addMessage(String message) {
         chatArea.appendText(message + "\n");
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 
     String getPlayerName() {
@@ -227,10 +264,6 @@ public class BlackjackGUI extends Application {
         dialog.setContentText("Enter your name:");
 
         Optional<String> result = dialog.showAndWait();
-        return result.orElse("Player");
-    }
-
-    public static void main(String[] args) {
-        launch(args);
+        return result.orElse(""); // Return an empty string if no name is entered
     }
 }
