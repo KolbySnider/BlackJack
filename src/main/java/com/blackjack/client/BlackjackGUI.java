@@ -77,6 +77,7 @@ public class BlackjackGUI extends Application {
         client = new BlackjackClient("localhost", 8888, this);
         System.out.println("Player name: " + name); // Debugging statement
         client.setPlayerName(name);
+        BlackjackClient.getCurrentState().addPlayer(new Player(name));
         client.start(name);
 
         // Create main game screen
@@ -167,43 +168,49 @@ public class BlackjackGUI extends Application {
 
     public void updateGameState(GameState gameState) {
         Platform.runLater(() -> {
-            Player player = gameState.getPlayer(playerName);
-            System.out.println(balanceLabel + " : " + player);
-            balanceLabel.setText("Balance: $" + player.getBalance());
+            Player player = gameState.getPlayer(client.getPlayerName());
+            if (player != null) {
+                balanceLabel.setText("Balance: $" + player.getBalance());
 
-            playerCardsBox.getChildren().clear();
-            for (Card card : player.getHand().getCards()) {
-                playerCardsBox.getChildren().add(createCardImageView(card));
-            }
-
-            dealerCardsBox.getChildren().clear();
-            List<Card> dealerCards = gameState.getDealer().getHand().getCards();
-            for (int i = 0; i < dealerCards.size(); i++) {
-                if (i == 0 && !gameState.isGameOver()) {
-                    ImageView backImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/back.png")));
-                    backImageView.setFitWidth(60);
-                    backImageView.setFitHeight(80);
-                    dealerCardsBox.getChildren().add(backImageView);
-                } else {
-                    dealerCardsBox.getChildren().add(createCardImageView(dealerCards.get(i)));
+                playerCardsBox.getChildren().clear();
+                List<Card> playerCards = player.getHand().getCards();
+                System.out.println("Player cards: " + playerCards);
+                for (Card card : playerCards) {
+                    System.out.println("Player card: " + card);
+                    playerCardsBox.getChildren().add(createCardImageView(card));
                 }
-            }
 
-            if (gameState.isGameOver()) {
-                String result = getGameResult(player, gameState);
-                messageLabel.setText(result);
-                hitButton.setDisable(true);
-                standButton.setDisable(true);
-            } else {
-                messageLabel.setText("");
-                Player currentPlayer = gameState.getCurrentPlayer();
-                if (currentPlayer != null && currentPlayer.getName().equals(playerName)) {
-                    hitButton.setDisable(false);
-                    standButton.setDisable(false);
-                } else {
+                dealerCardsBox.getChildren().clear();
+                List<Card> dealerCards = gameState.getDealer().getHand().getCards();
+                for (int i = 0; i < dealerCards.size(); i++) {
+                    if (i == 0 && !gameState.isGameOver()) {
+                        ImageView backImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/back.png")));
+                        backImageView.setFitWidth(60);
+                        backImageView.setFitHeight(80);
+                        dealerCardsBox.getChildren().add(backImageView);
+                    } else {
+                        dealerCardsBox.getChildren().add(createCardImageView(dealerCards.get(i)));
+                    }
+                }
+
+                if (gameState.isGameOver()) {
+                    String result = getGameResult(player, gameState);
+                    messageLabel.setText(result);
                     hitButton.setDisable(true);
                     standButton.setDisable(true);
+                } else {
+                    messageLabel.setText("");
+                    Player currentPlayer = gameState.getCurrentPlayer();
+                    if (currentPlayer != null && currentPlayer.getName().equals(client.getPlayerName())) {
+                        hitButton.setDisable(false);
+                        standButton.setDisable(false);
+                    } else {
+                        hitButton.setDisable(true);
+                        standButton.setDisable(true);
+                    }
                 }
+            } else {
+                System.out.println("Player not found in the game state: " + client.getPlayerName());
             }
         });
     }
@@ -287,15 +294,5 @@ public class BlackjackGUI extends Application {
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    String getPlayerName() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Player Name");
-        dialog.setHeaderText(null);
-        dialog.setContentText("Enter your name:");
-
-        Optional<String> result = dialog.showAndWait();
-        return result.orElse(""); // Return an empty string if no name is entered
     }
 }

@@ -61,4 +61,9 @@ public class ClientHandler implements Runnable {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
+    @Override
+    public String toString() {
+        return getPlayer() != null ? getPlayer().getName() : "null";
+    }
 }

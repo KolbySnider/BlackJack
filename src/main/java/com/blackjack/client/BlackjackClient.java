@@ -21,6 +21,7 @@ public class BlackjackClient {
 
     public BlackjackClient(String serverAddress, int serverPort, BlackjackGUI gui) {
         this.gui = gui;
+        currentState = new GameState(); // Initialize currentState with a new GameState object
         try {
             socket = new Socket(serverAddress, serverPort);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -35,7 +36,6 @@ public class BlackjackClient {
     }
 
     public void start(String name) {
-        // Prompt for player name
         setPlayerName(name);
 
         // Send player name to the server

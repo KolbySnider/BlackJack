@@ -5,16 +5,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GameState implements Serializable {
-    private Map<String, Player> players;
+    private final AtomicReference<Map<String, Player>> players = new AtomicReference<>();
     private Dealer dealer;
     private Deck deck;
     private boolean gameOver;
     private int currentPlayerIndex;
 
+    private boolean initialCardsDealt;
+
     public GameState() {
-        players = new HashMap<>();
+        players.set(new HashMap<>());
         dealer = new Dealer();
         deck = new Deck();
         gameOver = false;
@@ -23,19 +26,31 @@ public class GameState implements Serializable {
 
     public void addPlayer(Player player) {
         System.out.println("Player set");
-        players.put(player.getName(), player);
+        players.updateAndGet(map -> {
+            map.put(player.getName(), player);
+            return map;
+        });
     }
 
     public void removePlayer(Player player) {
-        players.remove(player.getName());
+        players.updateAndGet(map -> {
+            map.remove(player.getName());
+            return map;
+        });
     }
 
     public List<Player> getAllPlayers() {
-        return new ArrayList<>(players.values());
+        return new ArrayList<>(players.get().values());
+    }
+    public Player getCurrentPlayer() {
+        if (currentPlayerIndex < getAllPlayers().size()) {
+            return getAllPlayers().get(currentPlayerIndex);
+        }
+        return null;
     }
 
     public Player getPlayer(String playerName) {
-        return players.get(playerName);
+        return players.get().get(playerName);
     }
 
     public Dealer getDealer() {
@@ -43,7 +58,7 @@ public class GameState implements Serializable {
     }
 
     public void startNewGame() {
-        for (Player player : players.values()) {
+        for (Player player : players.get().values()) {
             player.getHand().getCards().clear();
             player.resetBet();
         }
@@ -55,12 +70,20 @@ public class GameState implements Serializable {
     }
 
     public void dealInitialCards() {
-        for (Player player : players.values()) {
-            player.getHand().addCard(deck.drawCard());
-            player.getHand().addCard(deck.drawCard());
+        System.out.println("Players map: " + players);
+        for (Player player : players.get().values()) {
+            Card card1 = deck.drawCard();
+            Card card2 = deck.drawCard();
+            player.getHand().addCard(card1);
+            player.getHand().addCard(card2);
+            System.out.println("Dealt cards to player " + player.getName() + ": " + card1.getRank() + " of " + card1.getSuit() + ", " + card2.getRank() + " of " + card2.getSuit());
         }
-        dealer.getHand().addCard(deck.drawCard());
-        dealer.getHand().addCard(deck.drawCard());
+        Card dealerCard1 = deck.drawCard();
+        Card dealerCard2 = deck.drawCard();
+        dealer.getHand().addCard(dealerCard1);
+        dealer.getHand().addCard(dealerCard2);
+        System.out.println("Dealt cards to dealer: " + dealerCard1.getRank() + " of " + dealerCard1.getSuit() + ", " + dealerCard2.getRank() + " of " + dealerCard2.getSuit());
+        initialCardsDealt = true;
     }
 
     public void playerHit(Player player) {
@@ -69,7 +92,7 @@ public class GameState implements Serializable {
 
     public void playerStand(Player player) {
         currentPlayerIndex++;
-        if (currentPlayerIndex >= players.size()) {
+        if (currentPlayerIndex >= players.get().size()) {
             dealerTurn();
             endGame();
         }
@@ -78,7 +101,7 @@ public class GameState implements Serializable {
     public void playerBust(Player player) {
         player.resetBet();
         currentPlayerIndex++;
-        if (currentPlayerIndex >= players.size()) {
+        if (currentPlayerIndex >= players.get().size()) {
             endGame();
         }
     }
@@ -92,7 +115,7 @@ public class GameState implements Serializable {
     public void determineWinners() {
         int dealerValue = dealer.getHand().getValue();
 
-        for (Player player : players.values()) {
+        for (Player player : players.get().values()) {
             int playerValue = player.getHand().getValue();
 
             if (playerValue > 21) {
@@ -115,11 +138,10 @@ public class GameState implements Serializable {
     public boolean isGameOver() {
         return gameOver;
     }
-
-    public Player getCurrentPlayer() {
-        if (currentPlayerIndex < getAllPlayers().size()) {
-            return getAllPlayers().get(currentPlayerIndex);
-        }
-        return null;
+    public boolean isInitialCardsDealt() {
+        return initialCardsDealt;
     }
+
+
+
 }

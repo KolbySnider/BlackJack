@@ -39,10 +39,6 @@ public class BlackjackServer {
 
                 connectedPlayers++;
                 System.out.println("Player connected. Connected players: " + connectedPlayers);
-
-                if (connectedPlayers == REQUIRED_PLAYERS) {
-                    startGame();
-                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -52,8 +48,20 @@ public class BlackjackServer {
     private void startGame() {
         System.out.println("Starting the game...");
         gameState.startNewGame();
+
+        // Add players to the GameState before dealing initial cards
+        for (ClientHandler client : clients) {
+            Player player = client.getPlayer();
+            if (player != null) {
+                gameState.addPlayer(player);
+            }
+        }
+
         gameState.dealInitialCards();
-        broadcast(new Message(MessageType.GAME_STATE, gameState));
+
+        if (gameState.isInitialCardsDealt()) {
+            broadcast(new Message(MessageType.GAME_STATE, gameState));
+        }
     }
 
     public synchronized void broadcast(Message message) {
@@ -71,6 +79,10 @@ public class BlackjackServer {
                 sender.setPlayer(player);
                 broadcast(new Message(MessageType.PLAYER_JOINED, playerName));
                 System.out.println("Player " + playerName + " joined the game.");
+
+                if (gameState.getAllPlayers().size() == REQUIRED_PLAYERS) {
+                    startGame();
+                }
                 break;
             case PLACE_BET:
                 int betAmount = (int) message.getPayload();
@@ -102,8 +114,11 @@ public class BlackjackServer {
 
     public synchronized void removeClient(ClientHandler client) {
         clients.remove(client);
-        gameState.removePlayer(client.getPlayer());
-        broadcast(new Message(MessageType.PLAYER_LEFT, client.getPlayer().getName()));
+        Player player = client.getPlayer();
+        if (player != null) {
+            gameState.removePlayer(player);
+            broadcast(new Message(MessageType.PLAYER_LEFT, player.getName()));
+        }
     }
 
     public GameState getGameState() {
