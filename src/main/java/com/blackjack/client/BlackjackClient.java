@@ -34,13 +34,12 @@ public class BlackjackClient {
         }
     }
 
-    public void start() {
+    public void start(String name) {
         // Prompt for player name
-        String playerName = (String) gui.getPlayerName();
-        setPlayerName(playerName);
+        setPlayerName(name);
 
         // Send player name to the server
-        sendMessage(new Message(MessageType.PLAYER_JOINED, playerName));
+        sendMessage(new Message(MessageType.PLAYER_JOINED, name));
 
         // Start listening for server messages
         new Thread(() -> {

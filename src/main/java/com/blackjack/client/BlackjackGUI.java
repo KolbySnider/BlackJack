@@ -77,7 +77,7 @@ public class BlackjackGUI extends Application {
         client = new BlackjackClient("localhost", 8888, this);
         System.out.println("Player name: " + name); // Debugging statement
         client.setPlayerName(name);
-        client.start();
+        client.start(name);
 
         // Create main game screen
         VBox gameScreen = createGameScreen();
@@ -180,8 +180,6 @@ public class BlackjackGUI extends Application {
             List<Card> dealerCards = gameState.getDealer().getHand().getCards();
             for (int i = 0; i < dealerCards.size(); i++) {
                 if (i == 0 && !gameState.isGameOver()) {
-                    System.out.println(getClass());
-                    //System.out.println(getClass().get);
                     ImageView backImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/back.png")));
                     backImageView.setFitWidth(60);
                     backImageView.setFitHeight(80);
