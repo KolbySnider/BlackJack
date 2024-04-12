@@ -22,6 +22,7 @@ public class GameState implements Serializable {
     }
 
     public void addPlayer(Player player) {
+        System.out.println("Player set");
         players.put(player.getName(), player);
     }
 

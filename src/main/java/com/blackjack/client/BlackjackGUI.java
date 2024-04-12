@@ -66,6 +66,7 @@ public class BlackjackGUI extends Application {
             if (!playerName.isEmpty()) {
                 connectToServer(playerName);
             }
+            BlackjackClient.getCurrentState().addPlayer(new Player(playerName));
         });
 
         startScreen.getChildren().addAll(titleLabel, nameTextField, connectButton);
@@ -167,6 +168,7 @@ public class BlackjackGUI extends Application {
     public void updateGameState(GameState gameState) {
         Platform.runLater(() -> {
             Player player = gameState.getPlayer(playerName);
+            System.out.println(balanceLabel + " : " + player);
             balanceLabel.setText("Balance: $" + player.getBalance());
 
             playerCardsBox.getChildren().clear();
@@ -178,7 +180,9 @@ public class BlackjackGUI extends Application {
             List<Card> dealerCards = gameState.getDealer().getHand().getCards();
             for (int i = 0; i < dealerCards.size(); i++) {
                 if (i == 0 && !gameState.isGameOver()) {
-                    ImageView backImageView = new ImageView(new Image(getClass().getResourceAsStream("images/back.png")));
+                    System.out.println(getClass());
+                    //System.out.println(getClass().get);
+                    ImageView backImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/back.png")));
                     backImageView.setFitWidth(60);
                     backImageView.setFitHeight(80);
                     dealerCardsBox.getChildren().add(backImageView);
@@ -241,7 +245,8 @@ public class BlackjackGUI extends Application {
                 rankForImagePath = rank;
                 break;
         }
-        String imagePath = "images/" + rankForImagePath + "_of_" + card.getSuit().toLowerCase() + ".png";
+        String imagePath = "/images/" + rankForImagePath + "_of_" + card.getSuit().toLowerCase() + ".png";
+        System.out.println("Image path: " + imagePath);
         Image image = new Image(getClass().getResourceAsStream(imagePath));
         if (image.isError()) {
             System.err.println("Error loading image: " + imagePath);
