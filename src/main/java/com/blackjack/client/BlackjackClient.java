@@ -12,7 +12,7 @@ import java.net.Socket;
 
 public class BlackjackClient {
 
-    private static GameState currentState; // I am doing this because I am lazy. This is a fucked way of handing this
+    private GameState currentState; // I am doing this because I am lazy. This is a fucked way of handing this
     private Socket socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
@@ -21,7 +21,7 @@ public class BlackjackClient {
 
     public BlackjackClient(String serverAddress, int serverPort, BlackjackGUI gui) {
         this.gui = gui;
-        currentState = new GameState(); // Initialize currentState with a new GameState object
+        this.currentState = new GameState(); // Initialize currentState with a new GameState object
         try {
             socket = new Socket(serverAddress, serverPort);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -101,7 +101,7 @@ public class BlackjackClient {
         this.playerName = playerName;
     }
 
-    public static GameState getCurrentState() {
+    public GameState getCurrentState() {
         return currentState;
     }
 }

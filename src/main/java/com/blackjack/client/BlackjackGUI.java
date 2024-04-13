@@ -65,19 +65,28 @@ public class BlackjackGUI extends Application {
             playerName = nameTextField.getText().trim();
             if (!playerName.isEmpty()) {
                 connectToServer(playerName);
+                // Ensure client is already initialized and ready to be used.
+                if (client != null) {
+                    client.getCurrentState().addPlayer(new Player(playerName)); // Use the client instance
+                } else {
+                    System.err.println("Client is not initialized when attempting to add a player.");
+                }
             }
-            BlackjackClient.getCurrentState().addPlayer(new Player(playerName));
         });
 
         startScreen.getChildren().addAll(titleLabel, nameTextField, connectButton);
         return startScreen;
     }
 
+
     private void connectToServer(String name) {
         client = new BlackjackClient("localhost", 8888, this);
         System.out.println("Player name: " + name); // Debugging statement
         client.setPlayerName(name);
-        BlackjackClient.getCurrentState().addPlayer(new Player(name));
+
+        // Correcting the access to getCurrentState()
+        client.getCurrentState().addPlayer(new Player(name)); // Access through instance `client`
+
         client.start(name);
 
         // Create main game screen
@@ -85,6 +94,7 @@ public class BlackjackGUI extends Application {
         Scene gameScene = new Scene(gameScreen, 800, 600);
         stage.setScene(gameScene);
     }
+
 
     private VBox createGameScreen() {
         VBox gameScreen = new VBox(10);
