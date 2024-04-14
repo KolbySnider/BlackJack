@@ -24,7 +24,7 @@ public class GameState implements Serializable {
         currentPlayerIndex = 0;
     }
 
-    public void addPlayer(Player player) {
+    public synchronized void addPlayer(Player player) {
         System.out.println("Player set");
         players.updateAndGet(map -> {
             map.put(player.getName(), player);
@@ -32,7 +32,7 @@ public class GameState implements Serializable {
         });
     }
 
-    public void removePlayer(Player player) {
+    public synchronized void removePlayer(Player player) {
         players.updateAndGet(map -> {
             map.remove(player.getName());
             return map;
@@ -69,7 +69,7 @@ public class GameState implements Serializable {
         currentPlayerIndex = 0;
     }
 
-    public void dealInitialCards() {
+    public synchronized void dealInitialCards() {
         System.out.println("Players map: " + players);
         for (Player player : players.get().values()) {
             Card card1 = deck.drawCard();
