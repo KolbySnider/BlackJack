@@ -11,6 +11,6 @@ public class Main {
         server.start();
 
         // Start the client GUI
-        Application.launch(BlackjackGUI.class, args);
+        // Application.launch(BlackjackGUI.class, args);
     }
 }

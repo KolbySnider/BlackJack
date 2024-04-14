@@ -48,4 +48,14 @@ public class Player implements Serializable {
         balance += bet * 2;
         bet = 0;
     }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", hand=" + hand +
+                ", balance=" + balance +
+                ", bet=" + bet +
+                '}';
+    }
 }

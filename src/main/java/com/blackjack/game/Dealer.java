@@ -12,4 +12,11 @@ public class Dealer implements Serializable {
     public Hand getHand() {
         return hand;
     }
+
+    @Override
+    public String toString() {
+        return "Dealer{" +
+                "hand=" + hand +
+                '}';
+    }
 }

@@ -69,12 +69,15 @@ public class BlackjackClient {
                 System.out.println("Gamestate message");
                 GameState gameState = (GameState) message.getPayload();
                 currentState = gameState;
+                System.out.println("CURRENT GAMESTATE1: " + gameState.toString());
                 Platform.runLater(() -> gui.updateGameState(gameState));
+                System.out.println("CURRENT GAMESTATE: " + gameState.toString());
                 break;
             case CHAT_MESSAGE:
                 String chatMessage = (String) message.getPayload();
                 Platform.runLater(() -> gui.addMessage(chatMessage));
                 break;
+
         }
     }
 

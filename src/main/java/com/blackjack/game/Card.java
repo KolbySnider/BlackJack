@@ -32,4 +32,12 @@ public class Card implements Serializable {
                 return Integer.parseInt(rank);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "suit='" + suit + '\'' +
+                ", rank='" + rank + '\'' +
+                '}';
+    }
 }

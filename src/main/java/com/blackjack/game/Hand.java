@@ -38,4 +38,11 @@ public class Hand implements Serializable {
 
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "Hand{" +
+                "cards=" + cards +
+                '}';
+    }
 }

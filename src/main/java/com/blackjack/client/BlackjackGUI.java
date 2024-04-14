@@ -65,12 +65,6 @@ public class BlackjackGUI extends Application {
             playerName = nameTextField.getText().trim();
             if (!playerName.isEmpty()) {
                 connectToServer(playerName);
-                // Ensure client is already initialized and ready to be used.
-                if (client != null) {
-                    client.getCurrentState().addPlayer(new Player(playerName)); // Use the client instance
-                } else {
-                    System.err.println("Client is not initialized when attempting to add a player.");
-                }
             }
         });
 
@@ -85,6 +79,7 @@ public class BlackjackGUI extends Application {
         client.setPlayerName(name);
 
         // Correcting the access to getCurrentState()
+        System.out.println("PS2");
         client.getCurrentState().addPlayer(new Player(name)); // Access through instance `client`
 
         client.start(name);
@@ -177,8 +172,11 @@ public class BlackjackGUI extends Application {
     }
 
     public void updateGameState(GameState gameState) {
+        System.out.println("PASSED GAMESTATE1: " + gameState.toString());
         Platform.runLater(() -> {
+            System.out.println("PASSED GAMESTATE: " + gameState.toString());
             Player player = gameState.getPlayer(client.getPlayerName());
+            System.out.println("Player: " + player);
             if (player != null) {
                 balanceLabel.setText("Balance: $" + player.getBalance());
 
@@ -227,39 +225,21 @@ public class BlackjackGUI extends Application {
 
     private ImageView createCardImageView(Card card) {
         String rank = card.getRank().toLowerCase();
-        String rankForImagePath;
-        switch (rank) {
-            case "2":
-                rankForImagePath = "two";
-                break;
-            case "3":
-                rankForImagePath = "three";
-                break;
-            case "4":
-                rankForImagePath = "four";
-                break;
-            case "5":
-                rankForImagePath = "five";
-                break;
-            case "6":
-                rankForImagePath = "six";
-                break;
-            case "7":
-                rankForImagePath = "seven";
-                break;
-            case "8":
-                rankForImagePath = "eight";
-                break;
-            case "9":
-                rankForImagePath = "nine";
-                break;
-            case "10":
-                rankForImagePath = "ten";
-                break;
-            default:
-                rankForImagePath = rank;
-                break;
-        }
+        String rankForImagePath = switch (rank) {
+            case "2" -> "two";
+            case "3" -> "three";
+            case "4" -> "four";
+            case "5" -> "five";
+            case "6" -> "six";
+            case "7" -> "seven";
+            case "8" -> "eight";
+            case "9" -> "nine";
+            case "10" -> "ten";
+            default -> rank;
+        };
+
+
+
         String imagePath = "/images/" + rankForImagePath + "_of_" + card.getSuit().toLowerCase() + ".png";
         System.out.println("Image path: " + imagePath);
         Image image = new Image(getClass().getResourceAsStream(imagePath));

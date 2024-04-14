@@ -53,6 +53,7 @@ public class BlackjackServer {
         for (ClientHandler client : clients) {
             Player player = client.getPlayer();
             if (player != null) {
+                System.out.println("PS3");
                 gameState.addPlayer(player);
             }
         }
@@ -75,6 +76,7 @@ public class BlackjackServer {
             case PLAYER_JOINED:
                 String playerName = (String) message.getPayload();
                 Player player = new Player(playerName);
+                System.out.println("PS4");
                 gameState.addPlayer(player);
                 sender.setPlayer(player);
                 broadcast(new Message(MessageType.PLAYER_JOINED, playerName));

@@ -94,7 +94,7 @@ public class GameState implements Serializable {
         currentPlayerIndex++;
         if (currentPlayerIndex >= players.get().size()) {
             dealerTurn();
-            endGame();
+            //endGame();
         }
     }
 
@@ -142,6 +142,15 @@ public class GameState implements Serializable {
         return initialCardsDealt;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "GameState{" +
+                "players=" + players +
+                ", dealer=" + dealer +
+                ", deck=" + deck +
+                ", gameOver=" + gameOver +
+                ", currentPlayerIndex=" + currentPlayerIndex +
+                ", initialCardsDealt=" + initialCardsDealt +
+                '}';
+    }
 }
