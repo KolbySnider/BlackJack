@@ -11,7 +11,6 @@ public class Player implements Serializable {
     public Player(String name) {
         this.name = name;
         this.hand = new Hand();
-        this.balance = 500;
         this.bet = 0;
     }
 
@@ -27,9 +26,7 @@ public class Player implements Serializable {
         return balance;
     }
 
-    public int getBet() {
-        return bet;
-    }
+
 
     public void placeBet(int amount) {
         if (amount > balance) {

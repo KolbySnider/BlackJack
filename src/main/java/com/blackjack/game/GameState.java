@@ -67,7 +67,6 @@ public class GameState implements Serializable {
     public void startNewGame() {
         for (Player player : players.get().values()) {
             player.getHand().getCards().clear();
-            player.resetBet();
         }
         dealer.getHand().getCards().clear();
         deck = new Deck();
@@ -115,7 +114,6 @@ public class GameState implements Serializable {
     }
 
     public void playerBust(Player player) {
-        player.resetBet();
         currentPlayerIndex++;
         if (currentPlayerIndex >= players.get().size()) {
             endGame();

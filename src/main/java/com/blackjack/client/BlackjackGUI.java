@@ -115,12 +115,6 @@ public class BlackjackGUI extends Application {
         // Add the player's name and cards to the new HBox
         playerNameAndCardsBox.getChildren().addAll(playerLabel, playerCardsBox);
 
-        balanceLabel = new Label("Balance: $1000");
-        betTextField = new TextField();
-        betTextField.setPromptText("Enter bet amount");
-        betTextField.setMaxWidth(100);
-        Button betButton = new Button("Place Bet");
-        betButton.setOnAction(e -> placeBet());
         hitButton = new Button("Hit");
         hitButton.setOnAction(e -> hit());
         standButton = new Button("Stand");
@@ -129,7 +123,7 @@ public class BlackjackGUI extends Application {
         buttonBox.getChildren().addAll(hitButton, standButton);
 
         // Add the playerNameAndCardsBox to the playerBox
-        playerBox.getChildren().addAll(playerNameAndCardsBox, balanceLabel, betTextField, betButton, buttonBox);
+        playerBox.getChildren().addAll(playerNameAndCardsBox, buttonBox);
 
         messageLabel = new Label();
         messageLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
@@ -166,7 +160,7 @@ public class BlackjackGUI extends Application {
         }
     }
 
-    private void hit(GameState gameState) {
+    private void hit() {
         client.sendMessage(new Message(MessageType.PLAYER_ACTION, "HIT"));
     }
 
@@ -189,7 +183,6 @@ public class BlackjackGUI extends Application {
             Player player = gameState.getPlayer(client.getPlayerName());
             System.out.println("Player: " + player);
             if (player != null) {
-                balanceLabel.setText("Balance: $" + player.getBalance());
                 playerCardsBox.getChildren().clear();
                 List<Card> playerCards = player.getHand().getCards();
                 System.out.println("Player cards: " + playerCards);
@@ -217,7 +210,6 @@ public class BlackjackGUI extends Application {
                     hitButton.setDisable(true);
                     standButton.setDisable(true);
                 } else {
-                    messageLabel.setText("");
                     Player currentPlayer = gameState.getCurrentPlayer();
                     if (currentPlayer != null && currentPlayer.getName().equals(client.getPlayerName())) {
                         hitButton.setDisable(false);
