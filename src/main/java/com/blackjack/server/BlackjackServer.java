@@ -1,9 +1,11 @@
 package com.blackjack.server;
 
+import com.blackjack.client.BlackjackGUI;
 import com.blackjack.game.GameState;
 import com.blackjack.game.Player;
 import com.blackjack.network.Message;
 import com.blackjack.network.MessageType;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlackjackServer {
+    private static BlackjackGUI gui;
     private static final int PORT = 8888;
     private static final int REQUIRED_PLAYERS = 1;
 
@@ -72,6 +75,7 @@ public class BlackjackServer {
     }
 
     public synchronized void handleMessage(ClientHandler sender, Message message) {
+        System.out.println("HANDING MESSAGE: " + message.getType().toString());
         switch (message.getType()) {
             case PLAYER_JOINED:
                 String playerName = (String) message.getPayload();
@@ -93,10 +97,15 @@ public class BlackjackServer {
                 broadcast(new Message(MessageType.GAME_STATE, gameState));
                 break;
             case PLAYER_ACTION:
+                System.out.println("Player Action called");
+                System.out.println("PA: " + gameState);
                 String action = (String) message.getPayload();
+                System.out.println("PA: " + action);
                 Player currentPlayer = gameState.getCurrentPlayer();
+                System.out.println("If?: " + (currentPlayer == sender.getPlayer()));
                 if (currentPlayer == sender.getPlayer()) {
                     if (action.equals("HIT")) {
+                        System.out.println("Calling player hit");
                         gameState.playerHit(currentPlayer);
                         if (currentPlayer.getHand().getValue() > 21) {
                             gameState.playerBust(currentPlayer);

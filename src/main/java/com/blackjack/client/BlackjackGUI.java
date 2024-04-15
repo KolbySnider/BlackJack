@@ -6,7 +6,6 @@ import com.blackjack.game.Player;
 import com.blackjack.network.Message;
 import com.blackjack.network.MessageType;
 import com.blackjack.server.BlackjackServer;
-import com.blackjack.server.ClientHandler;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -20,11 +19,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.Optional;
 
 public class BlackjackGUI extends Application {
     private BlackjackClient client;
-    private BlackjackServer server;
     private Stage stage;
     private VBox playerBox;
     private Label balanceLabel;
@@ -169,7 +166,7 @@ public class BlackjackGUI extends Application {
         }
     }
 
-    private void hit() {
+    private void hit(GameState gameState) {
         client.sendMessage(new Message(MessageType.PLAYER_ACTION, "HIT"));
     }
 
@@ -193,7 +190,6 @@ public class BlackjackGUI extends Application {
             System.out.println("Player: " + player);
             if (player != null) {
                 balanceLabel.setText("Balance: $" + player.getBalance());
-
                 playerCardsBox.getChildren().clear();
                 List<Card> playerCards = player.getHand().getCards();
                 System.out.println("Player cards: " + playerCards);
@@ -251,8 +247,6 @@ public class BlackjackGUI extends Application {
             case "10" -> "ten";
             default -> rank;
         };
-
-
 
         String imagePath = "/images/" + rankForImagePath + "_of_" + card.getSuit().toLowerCase() + ".png";
         System.out.println("Image path: " + imagePath);

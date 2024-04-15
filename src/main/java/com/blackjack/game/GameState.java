@@ -84,6 +84,9 @@ public class GameState implements Serializable {
             player.getHand().addCard(card1);
             player.getHand().addCard(card2);
             System.out.println("Dealt cards to player " + player.getName() + ": " + card1.getRank() + " of " + card1.getSuit() + ", " + card2.getRank() + " of " + card2.getSuit());
+            int playerValue = player.getHand().getValue();
+            //test to see if value is working (it fucking is)
+            System.out.println(playerValue);
         }
         Card dealerCard1 = deck.drawCard();
         Card dealerCard2 = deck.drawCard();
@@ -94,7 +97,10 @@ public class GameState implements Serializable {
     }
 
     public void playerHit(Player player) {
+        System.out.println(player);
+        System.out.println("PLAYERHIT FUNC TEST");
         player.getHand().addCard(deck.drawCard());
+        System.out.println(player);
     }
 
     public void playerStand(Player player) {
@@ -133,16 +139,12 @@ public class GameState implements Serializable {
 
             if (playerValue > 21) {
                 player.resetBet();
-                server.broadcast(new Message(MessageType.CHAT_MESSAGE, player.getName() + " busts!"));
             } else if (dealerValue > 21 || playerValue > dealerValue) {
                 player.winBet();
-                server.broadcast(new Message(MessageType.CHAT_MESSAGE, player.getName() + " wins!"));
             } else if (playerValue == dealerValue) {
                 player.resetBet();
-                server.broadcast(new Message(MessageType.CHAT_MESSAGE, player.getName() + " pushes."));
             } else {
                 player.resetBet();
-                server.broadcast(new Message(MessageType.CHAT_MESSAGE, player.getName() + " loses."));
             }
         }
     }
