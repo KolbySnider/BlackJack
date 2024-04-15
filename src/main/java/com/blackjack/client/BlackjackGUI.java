@@ -20,20 +20,19 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
+
+
 public class BlackjackGUI extends Application {
     private BlackjackClient client;
     private Stage stage;
     private VBox playerBox;
-    private Label balanceLabel;
     private Label messageLabel;
     private HBox playerCardsBox;
     private HBox dealerCardsBox;
     private TextArea chatArea;
     private TextField chatTextField;
-    private TextField betTextField;
     private Button hitButton;
     private Button standButton;
-
     private String playerName;
 
     @Override
@@ -146,7 +145,7 @@ public class BlackjackGUI extends Application {
         return gameScreen;
     }
 
-    private void placeBet() {
+    /*private void placeBet() {
         String betAmountString = betTextField.getText().trim();
         if (!betAmountString.isEmpty()) {
             try {
@@ -158,7 +157,7 @@ public class BlackjackGUI extends Application {
         } else {
             showAlert("Missing Bet Amount", "Please enter a bet amount.");
         }
-    }
+    }*/
 
     private void hit() {
         client.sendMessage(new Message(MessageType.PLAYER_ACTION, "HIT"));
