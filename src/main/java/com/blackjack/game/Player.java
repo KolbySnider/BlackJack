@@ -11,7 +11,7 @@ public class Player implements Serializable {
     public Player(String name) {
         this.name = name;
         this.hand = new Hand();
-        this.balance = 1000;
+        this.balance = 500;
         this.bet = 0;
     }
 

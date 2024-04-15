@@ -5,6 +5,8 @@ import com.blackjack.game.GameState;
 import com.blackjack.game.Player;
 import com.blackjack.network.Message;
 import com.blackjack.network.MessageType;
+import com.blackjack.server.BlackjackServer;
+import com.blackjack.server.ClientHandler;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -22,6 +24,7 @@ import java.util.Optional;
 
 public class BlackjackGUI extends Application {
     private BlackjackClient client;
+    private BlackjackServer server;
     private Stage stage;
     private VBox playerBox;
     private Label balanceLabel;
@@ -104,9 +107,18 @@ public class BlackjackGUI extends Application {
 
         playerBox = new VBox(10);
         playerBox.setAlignment(Pos.CENTER);
+
+        // Create a new HBox for the player's name and cards
+        HBox playerNameAndCardsBox = new HBox(10);
+        playerNameAndCardsBox.setAlignment(Pos.CENTER);
+
         Label playerLabel = new Label(playerName);
-        balanceLabel = new Label("Balance: $1000");
         playerCardsBox = new HBox(10);
+
+        // Add the player's name and cards to the new HBox
+        playerNameAndCardsBox.getChildren().addAll(playerLabel, playerCardsBox);
+
+        balanceLabel = new Label("Balance: $1000");
         betTextField = new TextField();
         betTextField.setPromptText("Enter bet amount");
         betTextField.setMaxWidth(100);
@@ -118,7 +130,9 @@ public class BlackjackGUI extends Application {
         standButton.setOnAction(e -> stand());
         HBox buttonBox = new HBox(10);
         buttonBox.getChildren().addAll(hitButton, standButton);
-        playerBox.getChildren().addAll(playerLabel, balanceLabel, playerCardsBox, betTextField, betButton, buttonBox);
+
+        // Add the playerNameAndCardsBox to the playerBox
+        playerBox.getChildren().addAll(playerNameAndCardsBox, balanceLabel, betTextField, betButton, buttonBox);
 
         messageLabel = new Label();
         messageLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
@@ -191,7 +205,7 @@ public class BlackjackGUI extends Application {
                 dealerCardsBox.getChildren().clear();
                 List<Card> dealerCards = gameState.getDealer().getHand().getCards();
                 for (int i = 0; i < dealerCards.size(); i++) {
-                    if (i == 0 && !gameState.isGameOver()) {
+                    if (i == dealerCards.size() - 1 && !gameState.isGameOver()) {
                         ImageView backImageView = new ImageView(new Image(getClass().getResourceAsStream("/images/back.png")));
                         backImageView.setFitWidth(60);
                         backImageView.setFitHeight(80);

@@ -1,5 +1,9 @@
 package com.blackjack.game;
 
+import com.blackjack.network.Message;
+import com.blackjack.network.MessageType;
+import com.blackjack.server.BlackjackServer;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,8 +17,8 @@ public class GameState implements Serializable {
     private Deck deck;
     private boolean gameOver;
     private int currentPlayerIndex;
-
     private boolean initialCardsDealt;
+    private BlackjackServer server;
 
     public GameState() {
         players.set(new HashMap<>());
@@ -22,6 +26,9 @@ public class GameState implements Serializable {
         deck = new Deck();
         gameOver = false;
         currentPlayerIndex = 0;
+    }
+    public GameState(BlackjackServer server) {
+        this.server = server;
     }
 
     public synchronized void addPlayer(Player player) {
@@ -94,7 +101,10 @@ public class GameState implements Serializable {
         currentPlayerIndex++;
         if (currentPlayerIndex >= players.get().size()) {
             dealerTurn();
-            //endGame();
+            endGame();
+            if (allPlayersFinished()) {
+                startNewGame();
+            }
         }
     }
 
@@ -103,6 +113,9 @@ public class GameState implements Serializable {
         currentPlayerIndex++;
         if (currentPlayerIndex >= players.get().size()) {
             endGame();
+            if (allPlayersFinished()) {
+                startNewGame();
+            }
         }
     }
 
@@ -120,14 +133,24 @@ public class GameState implements Serializable {
 
             if (playerValue > 21) {
                 player.resetBet();
+                server.broadcast(new Message(MessageType.CHAT_MESSAGE, player.getName() + " busts!"));
             } else if (dealerValue > 21 || playerValue > dealerValue) {
                 player.winBet();
+                server.broadcast(new Message(MessageType.CHAT_MESSAGE, player.getName() + " wins!"));
             } else if (playerValue == dealerValue) {
                 player.resetBet();
+                server.broadcast(new Message(MessageType.CHAT_MESSAGE, player.getName() + " pushes."));
             } else {
                 player.resetBet();
+                server.broadcast(new Message(MessageType.CHAT_MESSAGE, player.getName() + " loses."));
             }
         }
+    }
+    public void removePlayersWithNoBalance() {
+        players.updateAndGet(map -> {
+            map.values().removeIf(player -> player.getBalance() <= 0);
+            return map;
+        });
     }
 
     public void endGame() {
@@ -140,6 +163,14 @@ public class GameState implements Serializable {
     }
     public boolean isInitialCardsDealt() {
         return initialCardsDealt;
+    }
+    private boolean allPlayersFinished() {
+        for (Player player : players.get().values()) {
+            if (player.getHand().getValue() <= 21) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
