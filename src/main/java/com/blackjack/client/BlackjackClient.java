@@ -10,6 +10,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import static jdk.jfr.internal.StringPool.reset;
+
 public class BlackjackClient {
 
     private GameState currentState; // I am doing this because I am lazy. This is a fucked way of handing this
@@ -84,7 +86,7 @@ public class BlackjackClient {
     public void sendMessage(Message message) {
         try {
             if (outputStream != null) {
-                outputStream.writeObject(message);
+                outputStream.writeUnshared(message);
                 outputStream.flush();
             }
         } catch (IOException e) {

@@ -27,9 +27,7 @@ public class GameState implements Serializable {
         gameOver = false;
         currentPlayerIndex = 0;
     }
-    public GameState(BlackjackServer server) {
-        this.server = server;
-    }
+
 
     public synchronized void addPlayer(Player player) {
         System.out.println("Player set");
@@ -129,33 +127,9 @@ public class GameState implements Serializable {
         }
     }
 
-    public void determineWinners() {
-        int dealerValue = dealer.getHand().getValue();
-
-        for (Player player : players.get().values()) {
-            int playerValue = player.getHand().getValue();
-
-            if (playerValue > 21) {
-                player.resetBet();
-            } else if (dealerValue > 21 || playerValue > dealerValue) {
-                player.winBet();
-            } else if (playerValue == dealerValue) {
-                player.resetBet();
-            } else {
-                player.resetBet();
-            }
-        }
-    }
-    public void removePlayersWithNoBalance() {
-        players.updateAndGet(map -> {
-            map.values().removeIf(player -> player.getBalance() <= 0);
-            return map;
-        });
-    }
-
     public void endGame() {
         gameOver = true;
-        determineWinners();
+
     }
 
     public boolean isGameOver() {

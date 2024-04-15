@@ -16,7 +16,7 @@ import java.util.List;
 public class BlackjackServer {
     private static BlackjackGUI gui;
     private static final int PORT = 8888;
-    private static final int REQUIRED_PLAYERS = 2;// set for more than 1 if you want multiplayer
+    private static final int REQUIRED_PLAYERS = 1;// set for more than 1 if you want multiplayer
 
     private ServerSocket serverSocket;
     private List<ClientHandler> clients;
@@ -89,12 +89,6 @@ public class BlackjackServer {
                 if (gameState.getAllPlayers().size() == REQUIRED_PLAYERS) {
                     startGame();
                 }
-                break;
-            case PLACE_BET:
-                int betAmount = (int) message.getPayload();
-                Player betPlayer = sender.getPlayer();
-                betPlayer.placeBet(betAmount);
-                broadcast(new Message(MessageType.GAME_STATE, gameState));
                 break;
             case PLAYER_ACTION:
                 System.out.println("Player Action called");
