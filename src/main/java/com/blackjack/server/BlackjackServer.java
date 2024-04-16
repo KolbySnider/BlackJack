@@ -14,9 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlackjackServer {
-    private static BlackjackGUI gui;
     private static final int PORT = 8888;
-    private static final int REQUIRED_PLAYERS = 2;// set for more than 1 if you want multiplayer
+    private static final int REQUIRED_PLAYERS = 1;// set for more than 1 if you want multiplayer
 
     private ServerSocket serverSocket;
     private List<ClientHandler> clients;
@@ -94,7 +93,8 @@ public class BlackjackServer {
                     if (action.equals("HIT")) {
                         gameState.playerHit(currentPlayer);
                         if (currentPlayer.getHand().getValue() > 21) {
-                            gameState.playerBust(currentPlayer);
+                            gameState.endGame();
+                            broadcast(new Message(MessageType.GAME_STATE, gameState));
                         }
                     } else if (action.equals("STAND")) {
                         gameState.playerStand(currentPlayer);

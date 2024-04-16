@@ -12,7 +12,7 @@ import java.net.Socket;
 
 public class BlackjackClient {
 
-    private GameState currentState; // I am doing this because I am lazy. This is a fucked way of handing this
+    private GameState currentState; 
     private Socket socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
@@ -55,7 +55,6 @@ public class BlackjackClient {
     }
 
     private void handleMessage(Message message) {
-        System.out.println("Handing message");
         switch (message.getType()) {
             case PLAYER_JOINED:
                 String joinedPlayerName = (String) message.getPayload();
@@ -66,12 +65,9 @@ public class BlackjackClient {
                 Platform.runLater(() -> gui.addMessage(leftPlayerName + " left the game."));
                 break;
             case GAME_STATE:
-                System.out.println("Gamestate message");
                 GameState gameState = (GameState) message.getPayload();
                 currentState = gameState;
-                System.out.println("CURRENT GAMESTATE1: " + gameState.toString());
                 Platform.runLater(() -> gui.updateGameState(gameState));
-                System.out.println("CURRENT GAMESTATE: " + gameState.toString());
                 break;
             case CHAT_MESSAGE:
                 String chatMessage = (String) message.getPayload();

@@ -120,7 +120,6 @@ public class GameState implements Serializable {
         gameOver = true;
 
     }
-
     public boolean isGameOver() {
         return gameOver;
     }
