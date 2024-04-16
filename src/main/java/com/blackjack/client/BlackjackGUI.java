@@ -74,11 +74,9 @@ public class BlackjackGUI extends Application {
 
     private void connectToServer(String name) {
         client = new BlackjackClient("localhost", 8888, this);
-        System.out.println("Player name: " + name); // Debugging statement
         client.setPlayerName(name);
 
         // Correcting the access to getCurrentState()
-        System.out.println("PS2");
         client.getCurrentState().addPlayer(new Player(name)); // Access through instance `client`
 
         client.start(name);
@@ -145,20 +143,6 @@ public class BlackjackGUI extends Application {
         return gameScreen;
     }
 
-    /*private void placeBet() {
-        String betAmountString = betTextField.getText().trim();
-        if (!betAmountString.isEmpty()) {
-            try {
-                int betAmount = Integer.parseInt(betAmountString);
-                client.sendMessage(new Message(MessageType.PLACE_BET, betAmount));
-            } catch (NumberFormatException e) {
-                showAlert("Invalid Bet Amount", "Please enter a valid integer value.");
-            }
-        } else {
-            showAlert("Missing Bet Amount", "Please enter a bet amount.");
-        }
-    }*/
-
     private void hit() {
         client.sendMessage(new Message(MessageType.PLAYER_ACTION, "HIT"));
     }
@@ -176,17 +160,12 @@ public class BlackjackGUI extends Application {
     }
 
     public void updateGameState(GameState gameState) {
-        System.out.println("PASSED GAMESTATE1: " + gameState.toString());
         Platform.runLater(() -> {
-            System.out.println("PASSED GAMESTATE: " + gameState.toString());
             Player player = gameState.getPlayer(client.getPlayerName());
-            System.out.println("Player: " + player);
             if (player != null) {
                 playerCardsBox.getChildren().clear();
                 List<Card> playerCards = player.getHand().getCards();
-                System.out.println("Player cards: " + playerCards);
                 for (Card card : playerCards) {
-                    System.out.println("Player card: " + card);
                     playerCardsBox.getChildren().add(createCardImageView(card));
                 }
 
@@ -261,7 +240,6 @@ public class BlackjackGUI extends Application {
         }
 
         String imagePath = "/images/" + rankForImagePath + "_of_" + card.getSuit().toLowerCase() + ".png";
-        System.out.println("Image path: " + imagePath);
         Image image = new Image(getClass().getResourceAsStream(imagePath));
         if (image.isError()) {
             System.err.println("Error loading image: " + imagePath);

@@ -10,7 +10,5 @@ public class Main {
         BlackjackServer server = new BlackjackServer();
         server.start();
 
-        // Start the client GUI
-        // Application.launch(BlackjackGUI.class, args);
     }
 }

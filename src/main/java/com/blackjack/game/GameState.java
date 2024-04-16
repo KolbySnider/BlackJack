@@ -18,7 +18,6 @@ public class GameState implements Serializable {
     private boolean gameOver;
     private int currentPlayerIndex;
     private boolean initialCardsDealt;
-    private BlackjackServer server;
 
     public GameState() {
         players.set(new HashMap<>());
@@ -30,7 +29,6 @@ public class GameState implements Serializable {
 
 
     public synchronized void addPlayer(Player player) {
-        System.out.println("Player set");
         players.updateAndGet(map -> {
             map.put(player.getName(), player);
             return map;
@@ -74,30 +72,21 @@ public class GameState implements Serializable {
     }
 
     public synchronized void dealInitialCards() {
-        System.out.println("Players map: " + players);
         for (Player player : players.get().values()) {
             Card card1 = deck.drawCard();
             Card card2 = deck.drawCard();
             player.getHand().addCard(card1);
             player.getHand().addCard(card2);
-            System.out.println("Dealt cards to player " + player.getName() + ": " + card1.getRank() + " of " + card1.getSuit() + ", " + card2.getRank() + " of " + card2.getSuit());
-            int playerValue = player.getHand().getValue();
-            //test to see if value is working (it fucking is)
-            System.out.println(playerValue);
         }
         Card dealerCard1 = deck.drawCard();
         Card dealerCard2 = deck.drawCard();
         dealer.getHand().addCard(dealerCard1);
         dealer.getHand().addCard(dealerCard2);
-        System.out.println("Dealt cards to dealer: " + dealerCard1.getRank() + " of " + dealerCard1.getSuit() + ", " + dealerCard2.getRank() + " of " + dealerCard2.getSuit());
         initialCardsDealt = true;
     }
 
     public void playerHit(Player player) {
-        System.out.println(player);
-        System.out.println("PLAYERHIT FUNC TEST");
         player.getHand().addCard(deck.drawCard());
-        System.out.println(player);
     }
 
     public void playerStand(Player player) {

@@ -16,7 +16,7 @@ import java.util.List;
 public class BlackjackServer {
     private static BlackjackGUI gui;
     private static final int PORT = 8888;
-    private static final int REQUIRED_PLAYERS = 1;// set for more than 1 if you want multiplayer
+    private static final int REQUIRED_PLAYERS = 2;// set for more than 1 if you want multiplayer
 
     private ServerSocket serverSocket;
     private List<ClientHandler> clients;
@@ -56,7 +56,6 @@ public class BlackjackServer {
         for (ClientHandler client : clients) {
             Player player = client.getPlayer();
             if (player != null) {
-                System.out.println("PS3");
                 gameState.addPlayer(player);
             }
         }
@@ -75,12 +74,10 @@ public class BlackjackServer {
     }
 
     public synchronized void handleMessage(ClientHandler sender, Message message) {
-        System.out.println("HANDING MESSAGE: " + message.getType().toString());
         switch (message.getType()) {
             case PLAYER_JOINED:
                 String playerName = (String) message.getPayload();
                 Player player = new Player(playerName);
-                System.out.println("PS4");
                 gameState.addPlayer(player);
                 sender.setPlayer(player);
                 broadcast(new Message(MessageType.PLAYER_JOINED, playerName));
@@ -91,15 +88,10 @@ public class BlackjackServer {
                 }
                 break;
             case PLAYER_ACTION:
-                System.out.println("Player Action called");
-                System.out.println("PA: " + gameState);
                 String action = (String) message.getPayload();
-                System.out.println("PA: " + action);
                 Player currentPlayer = gameState.getCurrentPlayer();
-                System.out.println("If?: " + (currentPlayer == sender.getPlayer()));
                 if (currentPlayer == sender.getPlayer()) {
                     if (action.equals("HIT")) {
-                        System.out.println("Calling player hit");
                         gameState.playerHit(currentPlayer);
                         if (currentPlayer.getHand().getValue() > 21) {
                             gameState.playerBust(currentPlayer);
@@ -126,7 +118,4 @@ public class BlackjackServer {
         }
     }
 
-    public GameState getGameState() {
-        return gameState;
-    }
 }
