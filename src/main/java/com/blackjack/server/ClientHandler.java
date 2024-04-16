@@ -8,8 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import static jdk.jfr.internal.StringPool.reset;
-
 public class ClientHandler implements Runnable {
     private Socket socket;
     private ObjectOutputStream outputStream;
@@ -51,6 +49,7 @@ public class ClientHandler implements Runnable {
         try {
             outputStream.writeUnshared(message);
             outputStream.flush();
+            outputStream.reset();
         } catch (IOException e) {
             e.printStackTrace();
         }

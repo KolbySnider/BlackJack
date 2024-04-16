@@ -226,18 +226,39 @@ public class BlackjackGUI extends Application {
 
     private ImageView createCardImageView(Card card) {
         String rank = card.getRank().toLowerCase();
-        String rankForImagePath = switch (rank) {
-            case "2" -> "two";
-            case "3" -> "three";
-            case "4" -> "four";
-            case "5" -> "five";
-            case "6" -> "six";
-            case "7" -> "seven";
-            case "8" -> "eight";
-            case "9" -> "nine";
-            case "10" -> "ten";
-            default -> rank;
-        };
+        String rankForImagePath;
+
+        switch (rank) {
+            case "2" :
+                rankForImagePath = "two";
+                break;
+            case "3" :
+                rankForImagePath = "three";
+                break;
+            case "4" :
+                rankForImagePath = "four";
+                break;
+            case "5" :
+                rankForImagePath = "five";
+                break;
+            case "6" :
+                rankForImagePath = "six";
+                break;
+            case "7" :
+                rankForImagePath = "seven";
+                break;
+            case "8" :
+                rankForImagePath = "eight";
+                break;
+            case "9" :
+                rankForImagePath = "nine";
+                break;
+            case "10":
+                rankForImagePath = "ten";
+                break;
+            default:
+                rankForImagePath = rank;
+        }
 
         String imagePath = "/images/" + rankForImagePath + "_of_" + card.getSuit().toLowerCase() + ".png";
         System.out.println("Image path: " + imagePath);

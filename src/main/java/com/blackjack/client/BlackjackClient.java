@@ -10,8 +10,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import static jdk.jfr.internal.StringPool.reset;
-
 public class BlackjackClient {
 
     private GameState currentState; // I am doing this because I am lazy. This is a fucked way of handing this
