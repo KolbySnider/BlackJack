@@ -73,6 +73,11 @@ public class BlackjackClient {
                 String chatMessage = (String) message.getPayload();
                 Platform.runLater(() -> gui.addMessage(chatMessage));
                 break;
+            case NEW_ROUND:
+                GameState newGameState = (GameState) message.getPayload();
+                currentState = newGameState;
+                Platform.runLater(() -> gui.updateGameState(newGameState));
+                break;
 
         }
     }

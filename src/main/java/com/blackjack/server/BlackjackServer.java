@@ -15,7 +15,7 @@ import java.util.List;
 
 public class BlackjackServer {
     private static final int PORT = 8888;
-    private static final int REQUIRED_PLAYERS = 1;// set for more than 1 if you want multiplayer
+    private static final int REQUIRED_PLAYERS = 2;// set for more than 1 if you want multiplayer
 
     private ServerSocket serverSocket;
     private List<ClientHandler> clients;
@@ -65,6 +65,11 @@ public class BlackjackServer {
             broadcast(new Message(MessageType.GAME_STATE, gameState));
         }
     }
+    private void startNewRound() {
+        gameState.startNewGame();
+        gameState.dealInitialCards();
+        broadcast(new Message(MessageType.NEW_ROUND, gameState));
+    }
 
     public synchronized void broadcast(Message message) {
         for (ClientHandler client : clients) {
@@ -105,6 +110,9 @@ public class BlackjackServer {
             case CHAT_MESSAGE:
                 String chatMessage = (String) message.getPayload();
                 broadcast(new Message(MessageType.CHAT_MESSAGE, sender.getPlayer().getName() + ": " + chatMessage));
+                break;
+            case NEW_ROUND:
+                startNewRound();
                 break;
         }
     }

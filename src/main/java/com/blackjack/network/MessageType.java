@@ -5,5 +5,6 @@ public enum MessageType {
     PLAYER_LEFT,
     GAME_STATE,
     PLAYER_ACTION,
-    CHAT_MESSAGE
+    CHAT_MESSAGE,
+    NEW_ROUND
 }

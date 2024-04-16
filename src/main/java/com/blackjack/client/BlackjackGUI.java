@@ -5,7 +5,6 @@ import com.blackjack.game.GameState;
 import com.blackjack.game.Player;
 import com.blackjack.network.Message;
 import com.blackjack.network.MessageType;
-import com.blackjack.server.BlackjackServer;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -17,6 +16,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class BlackjackGUI extends Application {
 
 
     private void connectToServer(String name) {
-        client = new BlackjackClient("localhost", 8888, this);
+        client = new BlackjackClient("192.168.56.1", 8888, this);
         client.setPlayerName(name);
 
         // Correcting the access to getCurrentState()
@@ -187,6 +188,11 @@ public class BlackjackGUI extends Application {
                     messageLabel.setText(result);
                     hitButton.setDisable(true);
                     standButton.setDisable(true);
+
+                    // Start a new round after a delay of 5 seconds
+                    PauseTransition delay = new PauseTransition(Duration.seconds(5));
+                    delay.setOnFinished(event -> startNewRound());
+                    delay.play();
                 } else {
                     Player currentPlayer = gameState.getCurrentPlayer();
                     if (currentPlayer != null && currentPlayer.getName().equals(client.getPlayerName())) {
@@ -266,6 +272,10 @@ public class BlackjackGUI extends Application {
         } else {
             return "Push.";
         }
+    }
+    private void startNewRound() {
+        messageLabel.setText("");//clears result text at start of round
+        client.sendMessage(new Message(MessageType.NEW_ROUND, null));
     }
 
     void showAlert(String title, String message) {
