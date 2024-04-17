@@ -16,7 +16,6 @@ import java.util.List;
 public class BlackjackServer {
     private static final int PORT = 8888;
     private static final int REQUIRED_PLAYERS = 2;// set for more than 1 if you want multiplayer
-
     private ServerSocket serverSocket;
     private List<ClientHandler> clients;
     private GameState gameState;
@@ -98,8 +97,9 @@ public class BlackjackServer {
                     if (action.equals("HIT")) {
                         gameState.playerHit(currentPlayer);
                         if (currentPlayer.getHand().getValue() > 21) {
-                            gameState.endGame();
+                            gameState.playerBust(currentPlayer);
                             broadcast(new Message(MessageType.GAME_STATE, gameState));
+
                         }
                     } else if (action.equals("STAND")) {
                         gameState.playerStand(currentPlayer);

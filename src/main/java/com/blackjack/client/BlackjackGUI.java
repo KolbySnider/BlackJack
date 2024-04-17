@@ -18,7 +18,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
-
 import java.util.List;
 
 
@@ -74,7 +73,7 @@ public class BlackjackGUI extends Application {
 
 
     private void connectToServer(String name) {
-        client = new BlackjackClient("192.168.56.1", 8888, this);
+        client = new BlackjackClient("localhost", 8888, this);
         client.setPlayerName(name);
 
         // Correcting the access to getCurrentState()

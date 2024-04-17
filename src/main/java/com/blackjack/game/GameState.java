@@ -100,6 +100,14 @@ public class GameState implements Serializable {
         }
     }
 
+    public void playerBust(Player player) {
+        currentPlayerIndex++;
+        if (currentPlayerIndex >= players.get().size()) {
+            if (allPlayersFinished()) {
+                endGame();
+            }
+        }
+    }
 
     public void dealerTurn() {
         while (dealer.getHand().getValue() < 17) {
@@ -109,7 +117,6 @@ public class GameState implements Serializable {
 
     public void endGame() {
         gameOver = true;
-
     }
     public boolean isGameOver() {
         return gameOver;
