@@ -15,7 +15,7 @@ import java.util.List;
 
 public class BlackjackServer {
     private static final int PORT = 8888;
-    private static final int REQUIRED_PLAYERS = 2;// set for more than 1 if you want multiplayer
+    private static final int REQUIRED_PLAYERS = 2;
     private ServerSocket serverSocket;
     private List<ClientHandler> clients;
     private GameState gameState;

@@ -12,7 +12,7 @@ import java.net.Socket;
 
 public class BlackjackClient {
 
-    private GameState currentState; 
+    private GameState currentState;
     private Socket socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
@@ -90,7 +90,7 @@ public class BlackjackClient {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            // Handle the message sending failure, e.g., display an error message to the user
+            // Handle the message sending failure
             Platform.runLater(() -> {
                 gui.showAlert("Communication Error", "Failed to send message to the server. Please check the connection.");
             });

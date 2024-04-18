@@ -6,10 +6,6 @@ public class Message implements Serializable {
     private MessageType type;
     private Object payload;
 
-    public Message(MessageType type) {
-        this.type = type;
-    }
-
     public Message(MessageType type, Object payload) {
         this.type = type;
         this.payload = payload;

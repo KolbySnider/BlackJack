@@ -103,8 +103,10 @@ public class GameState implements Serializable {
     public void playerBust(Player player) {
         currentPlayerIndex++;
         if (currentPlayerIndex >= players.get().size()) {
+            dealerTurn();
+            endGame();
             if (allPlayersFinished()) {
-                endGame();
+                startNewGame();
             }
         }
     }
